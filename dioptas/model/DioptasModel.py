@@ -138,18 +138,16 @@ class ImgConfiguration(QtCore.QObject):
 
         self.integrate_image_1d()
 
-        self.pattern_model.pattern.auto_background_subtraction_roi = \
-            convert_units(self.pattern_model.pattern.auto_background_subtraction_roi[0],
-                          self.calibration_model.wavelength,
-                          previous_unit,
-                          new_unit), \
-            convert_units(self.pattern_model.pattern.auto_background_subtraction_roi[1],
-                          self.calibration_model.wavelength,
-                          previous_unit,
-                          new_unit)
-
         if auto_bg_subtraction:
+            convert_to_new_unit = lambda x: convert_units(x, self.calibration_model.wavelength, previous_unit, new_unit)
+            self.pattern_model.pattern.auto_background_subtraction_roi[0] = \
+                convert_to_new_unit(self.pattern_model.pattern.auto_background_subtraction_roi[0])
+            self.pattern_model.pattern.auto_background_subtraction_roi[1] = \
+                convert_to_new_unit(self.pattern_model.pattern.auto_background_subtraction_roi[1])
+            self.pattern_model.pattern.auto_background_subtraction_parameters[0] = \
+                convert_to_new_unit(self.pattern_model.pattern.auto_background_subtraction_parameters[0])
             self.pattern_model.pattern.auto_background_subtraction = True
+            self.pattern_model.pattern.recalculate_pattern()
 
     @property
     def integrate_cake(self):

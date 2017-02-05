@@ -22,6 +22,7 @@ import numpy as np
 from qtpy import QtWidgets, QtCore
 
 from ...widgets.UtilityWidgets import save_file_dialog, open_file_dialog
+from ...model.util.calc import convert_units
 
 # imports for type hinting in PyCharm -- DO NOT DELETE
 from ...model.DioptasModel import DioptasModel
@@ -361,27 +362,7 @@ class PatternController(object):
 
     def convert_x_value(self, value, previous_unit, new_unit):
         wavelength = self.model.calibration_model.wavelength
-        if previous_unit == '2th_deg':
-            tth = value
-        elif previous_unit == 'q_A^-1':
-            tth = np.arcsin(
-                value * 1e10 * wavelength / (4 * np.pi)) * 360 / np.pi
-        elif previous_unit == 'd_A':
-            tth = 2 * np.arcsin(wavelength / (2 * value * 1e-10)) * 180 / np.pi
-        else:
-            tth = 0
-
-        if new_unit == '2th_deg':
-            res = tth
-        elif new_unit == 'q_A^-1':
-            res = 4 * np.pi * \
-                  np.sin(tth / 360 * np.pi) / \
-                  wavelength / 1e10
-        elif new_unit == 'd_A':
-            res = wavelength / (2 * np.sin(tth / 360 * np.pi)) * 1e10
-        else:
-            res = 0
-        return res
+        return convert_units(value, wavelength, previous_unit, new_unit)
 
     def pattern_left_click(self, x, y):
         self.set_line_position(x)
