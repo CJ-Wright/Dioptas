@@ -54,6 +54,7 @@ class CalibrationModel(object):
                              'pixel_width': 79e-6,
                              'pixel_height': 79e-6,
                              'polarization_factor': 0.99}
+        self.spectrum_geometry.wavelength = self.start_values['wavelength']
         self.orig_pixel1 = 79e-6
         self.orig_pixel2 = 79e-6
         self.fit_wavelength = False
@@ -531,8 +532,6 @@ class CalibrationModel(object):
         x *= self.supersampling_factor
         y *= self.supersampling_factor
         return self.spectrum_geometry.chi(x, y)[0]
-
-        return azi
 
     def get_two_theta_array(self):
         return self.spectrum_geometry.twoThetaArray(self.img_model.img_data.shape)[::self.supersampling_factor,

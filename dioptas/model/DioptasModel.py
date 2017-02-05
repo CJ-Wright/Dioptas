@@ -140,12 +140,13 @@ class ImgConfiguration(QtCore.QObject):
 
         if auto_bg_subtraction:
             convert_to_new_unit = lambda x: convert_units(x, self.calibration_model.wavelength, previous_unit, new_unit)
-            self.pattern_model.pattern.auto_background_subtraction_roi[0] = \
-                convert_to_new_unit(self.pattern_model.pattern.auto_background_subtraction_roi[0])
-            self.pattern_model.pattern.auto_background_subtraction_roi[1] = \
-                convert_to_new_unit(self.pattern_model.pattern.auto_background_subtraction_roi[1])
-            self.pattern_model.pattern.auto_background_subtraction_parameters[0] = \
-                convert_to_new_unit(self.pattern_model.pattern.auto_background_subtraction_parameters[0])
+            self.pattern_model.pattern.auto_background_subtraction_roi = \
+                (convert_to_new_unit(self.pattern_model.pattern.auto_background_subtraction_roi[0]),
+                convert_to_new_unit(self.pattern_model.pattern.auto_background_subtraction_roi[1]))
+            self.pattern_model.pattern.auto_background_subtraction_parameters = \
+                (convert_to_new_unit(self.pattern_model.pattern.auto_background_subtraction_parameters[0]),
+                 self.pattern_model.pattern.auto_background_subtraction_parameters[1],
+                 self.pattern_model.pattern.auto_background_subtraction_parameters[2])
             self.pattern_model.pattern.auto_background_subtraction = True
             self.pattern_model.pattern.recalculate_pattern()
 

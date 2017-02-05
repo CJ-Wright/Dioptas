@@ -192,7 +192,7 @@ class PatternController(object):
                     con = 'CONS'
 
                 header = header + '\nBANK\t1\tNUM_POINTS\tNUM_POINTS ' + con + '\tMIN_X_VAL\tSTEP_X_VAL ' + \
-                         '{0:.5g}'.format(lam*1e10) + ' 0.0 FXYE'
+                         '{0:.5g}'.format(lam * 1e10) + ' 0.0 FXYE'
 
                 self.model.pattern_model.save_pattern(filename, header, subtract_background=subtract_background)
             elif filename.endswith('.png'):
@@ -262,30 +262,23 @@ class PatternController(object):
         self.model.pattern_model.set_file_iteration_mode('time')
 
     def update_bg_linear_region_to_new_unit(self, previous_unit, new_unit):
-        self.model.pattern_model.done_changing_unit = False
         self.widget.pattern_widget.linear_region_item.blockSignals(True)
         self.widget.bkg_spectrum_x_min_txt.blockSignals(True)
         self.widget.bkg_spectrum_x_max_txt.blockSignals(True)
-        (xmin, xmax) = self.widget.pattern_widget.get_linear_region()
-        xmin = self.convert_x_value(xmin, previous_unit, new_unit)
-        xmax = self.convert_x_value(xmax, previous_unit, new_unit)
+
+        x_min, x_max = self.model.pattern.auto_background_subtraction_roi
         if new_unit == 'd_A':
-            self.widget.pattern_widget.set_linear_region(xmax, xmin)
-            self.widget.bkg_spectrum_x_min_txt.setText('{0:.4g}'.format(xmax))
-            self.widget.bkg_spectrum_x_max_txt.setText('{0:.4g}'.format(xmin))
+            self.widget.pattern_widget.set_linear_region(x_max, x_min)
+            self.widget.bkg_spectrum_x_min_txt.setText('{0:.4g}'.format(x_max))
+            self.widget.bkg_spectrum_x_max_txt.setText('{0:.4g}'.format(x_min))
         else:
-            self.widget.pattern_widget.set_linear_region(xmin, xmax)
-            self.widget.bkg_spectrum_x_min_txt.setText('{0:.4g}'.format(xmin))
-            self.widget.bkg_spectrum_x_max_txt.setText('{0:.4g}'.format(xmax))
-        smooth_width = self.widget.bkg_spectrum_smooth_width_sb.value()
-        smooth_width = self.convert_x_value(smooth_width, previous_unit, new_unit)
-        self.widget.bkg_spectrum_smooth_width_sb.setValue(smooth_width)
+            self.widget.pattern_widget.set_linear_region(x_min, x_max)
+            self.widget.bkg_spectrum_x_min_txt.setText('{0:.4g}'.format(x_min))
+            self.widget.bkg_spectrum_x_max_txt.setText('{0:.4g}'.format(x_max))
+        # self.widget.bkg_spectrum_smooth_width_sb.setValue(self.model.pattern.auto_background_subtraction_parameters[0])
         self.widget.pattern_widget.linear_region_item.blockSignals(False)
         self.widget.bkg_spectrum_x_min_txt.blockSignals(False)
         self.widget.bkg_spectrum_x_max_txt.blockSignals(False)
-
-    def finish_update_bg_linear_region(self):
-        self.model.pattern_model.done_changing_unit = True
 
     def set_unit_tth(self):
         previous_unit = self.integration_unit
@@ -299,9 +292,6 @@ class PatternController(object):
         if self.model.calibration_model.is_calibrated:
             self.update_x_range(previous_unit, self.integration_unit)
             self.update_line_position(previous_unit, self.integration_unit)
-
-        self.finish_update_bg_linear_region()
-
 
     def set_unit_q(self):
         previous_unit = self.integration_unit
@@ -319,8 +309,6 @@ class PatternController(object):
             self.update_x_range(previous_unit, self.integration_unit)
             self.update_line_position(previous_unit, self.integration_unit)
 
-        self.finish_update_bg_linear_region()
-
     def set_unit_d(self):
         previous_unit = self.integration_unit
         if previous_unit == 'd_A':
@@ -337,8 +325,6 @@ class PatternController(object):
         if self.model.calibration_model.is_calibrated:
             self.update_x_range(previous_unit, self.integration_unit)
             self.update_line_position(previous_unit, self.integration_unit)
-
-        self.finish_update_bg_linear_region()
 
     def update_x_range(self, previous_unit, new_unit):
         old_x_axis_range = self.widget.pattern_widget.spectrum_plot.viewRange()[0]
